@@ -24,7 +24,7 @@ class CYLProgress extends StatefulWidget {
       this.cornerRadius = 10,
       this.borderColor});
 
-  factory CYLProgress.singleCircle(double percent, Color color,{double width, Color borderColor}) {
+  factory CYLProgress.singleCircle(double percent, Color color,{double width = 10, Color borderColor}) {
     return CYLProgress(
         type: CYLProgressType.circle,
         progressBuilder: (index) {
@@ -38,7 +38,7 @@ class CYLProgress extends StatefulWidget {
     );
   }
 
-  factory CYLProgress.singleLine(double percent, Color color,{double width, Color borderColor}){
+  factory CYLProgress.singleLine(double percent, Color color,{double width = 10, Color borderColor}){
     return CYLProgress(
       type: CYLProgressType.line,
       progressBuilder: (index) {
@@ -78,6 +78,7 @@ class CYLProgressPainter extends CustomPainter {
   Color defaultBackGroundColor = Color.fromARGB(255, 225, 225, 225);
 
   CYLProgressPainter(this._state) {
+    print('$_state, ${_state.widget.cornerRadius}');
     borderStrokeWidth = _state.widget.cornerRadius / 4;
     circleWidth = borderStrokeWidth * 5;
 
