@@ -214,6 +214,7 @@ class CYLProgressPainter extends CustomPainter {
     if (paths.length > 1) {
       _circlePathPaint.strokeCap = StrokeCap.square;
     }
+
     paths.forEach((Path path) {
       _circlePathPaint.color = _state.widget.colorBuilder(count);
       canvas.drawPath(path, _circlePathPaint);
