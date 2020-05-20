@@ -14,7 +14,7 @@ class SheetWidget extends StatefulWidget {
   final double fontSize;
   final DidClickItem didClickItem;
   final String title;
-  final String cancleTitle;
+  final String cancelTitle;
   final double titleFontSize;
 
 
@@ -26,7 +26,7 @@ class SheetWidget extends StatefulWidget {
         this.didClickItem,
         this.title,
         this.titleFontSize,
-        this.cancleTitle = '取消'
+        @required this.cancelTitle
       });
 
   void showSheet(){
@@ -123,7 +123,7 @@ class _SheetWidgetState extends State<SheetWidget> with TickerProviderStateMixin
    }
 
     if (i == widget.children.length) {//取消按钮
-      return SheetWidgetItem(widget.cancleTitle, (){
+      return SheetWidgetItem(widget.cancelTitle ?? 'Cancel', (){
       },textColor: Theme.of(context).primaryColor, isCancel: true,);
     }
 
