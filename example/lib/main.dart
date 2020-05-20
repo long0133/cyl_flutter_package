@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           width: 100,
           height: 100,
-          child: CYLProgress.singleCircle(0.8, Colors.green),
+          child: CYLProgress.singleCircle(0.5, Colors.green),
         )
       ),
       floatingActionButton: FloatingActionButton(
