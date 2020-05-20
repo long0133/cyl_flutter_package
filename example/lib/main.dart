@@ -1,59 +1,63 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:cyl_flutter_package/cyl_progress.dart';
+
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body:HomePage(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
 
+        primarySwatch: Colors.blue,
       ),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
-class HomePage extends StatefulWidget {
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+
+  final String title;
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  String _platformVersion = 'Unknown';
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
+  void _incrementCounter() {
+    setState(() {
+
+      _counter++;
+    });
   }
-
-
-  Future<void> initPlatformState() async {
-    if (!mounted) return;
-  }
-
 
   @override
   Widget build(BuildContext context) {
-    return  Center(
-      child:Column(
-        children: <Widget>[
-          Text('Running on'),
-          FlatButton(
-            child: Text('Tap'),
-            onPressed:(){
-            } ,
-          )
-        ],
+
+    return Scaffold(
+      appBar: AppBar(
+
+        title: Text(widget.title),
+      ),
+      body: Center(
+
+        child: Container(
+          width: 100,
+          height: 100,
+          child: CYLProgress.singleCircle(0.8, Colors.green),
+        )
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ),
     );
   }
