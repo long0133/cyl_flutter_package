@@ -8,14 +8,14 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+
   flutter:
     sdk: flutter
-
   #屏幕自适应
   flutter_screenutil: 1.0.2
-
   #状态管理
   provider: 4.0.4
+
 
 dev_dependencies:
   flutter_test:

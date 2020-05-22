@@ -50,6 +50,9 @@ class _CYLCheckWidgetState extends State<CYLCheckWidget> with SingleTickerProvid
   bool _isForwarding = true;
   bool animationComplete = false;
 
+  double viaWidth = 0;
+  bool changeDirection = false;
+
   //animation
   Duration animDuration = Duration(milliseconds: 300);
   Animation<double> animation;
@@ -117,8 +120,17 @@ class _CYLCheckWidgetState extends State<CYLCheckWidget> with SingleTickerProvid
       onPanUpdate: (DragUpdateDetails details){
 
         if(details.localPosition.dx < width){
+          viaWidth += details.delta.dx;
+
+          if(viaWidth == 0){
+            changeDirection = true;
+          }
+
+          if(changeDirection) return;
+
           setState(() {
-            if(details.delta.dx > 0){
+
+            if(viaWidth > 0){
               //forward
               _isForwarding = true;
               double delta = details.localPosition.dx - startOffSet.dx;
@@ -160,6 +172,8 @@ class _CYLCheckWidgetState extends State<CYLCheckWidget> with SingleTickerProvid
         this.dragBegin = true;
         this.dragEnd = false;
         this.startOffSet = details.localPosition;
+        viaWidth = 0;
+        changeDirection = false;
       },
       child: Container(
         color: Colors.grey,
@@ -178,7 +192,6 @@ class _CYLCheckWidgetState extends State<CYLCheckWidget> with SingleTickerProvid
     if (dragEnd){
       percent = animation.value;
     }
-
     print('percent: $percent');
     return percent;
   }
@@ -190,7 +203,7 @@ class CYLCheckPainter extends CustomPainter {
   CYLCheckWidget widget;
   _CYLCheckWidgetState state;
   double startAngle = pi * 2;
-  double swapAngle = pi/6 - pi * 2 ;
+  double deltaAngle = pi/4;
   Offset _circleCenter = Offset.zero;
 
   Offset get lineStartPoint {
@@ -202,7 +215,6 @@ class CYLCheckPainter extends CustomPainter {
 
   Paint _paint = Paint();
   Path _circlePath = Path();
-  Path _linePath = Path();
 
   CYLCheckPainter(this.widget, this.state){
     _paint = Paint()
@@ -227,26 +239,38 @@ class CYLCheckPainter extends CustomPainter {
     );
     _circlePath.reset();
 
+    double stAngle = startAngle * (1 - state.toAnimationGetPercent());
+    double swAngle = deltaAngle - pi*2 * (1 - state.toAnimationGetPercent());
+
     _circlePath.addArc(
         Rect.fromCenter(
             center: _circleCenter,
             width: state.diameter,
             height: state.diameter
         ),
-        startAngle * (1 - state.toAnimationGetPercent()),
-        swapAngle * (1 - state.toAnimationGetPercent())
+        stAngle,
+        swAngle
     );
 
-    _linePath.reset();
-    _linePath.moveTo(
-        lineStartPoint.dx,
-        lineStartPoint.dy
-    );
+//    Offset controlPoint = Offset(_circleCenter.dx + (state.diameter/10.0) * 6, (_circleCenter.dy / 10) * 10);
+//    Offset toPoint = Offset(controlPoint.dx + state.diameter/2.0, controlPoint.dy);
+//
+//    _circlePath.conicTo(controlPoint.dx, controlPoint.dy, toPoint.dx, toPoint.dy, 1);
+//    _circlePath.lineTo(
+//        state.toAnimationGetPercent() <= 0 ? lineStartPoint.dx : toPoint.dx + (state.lineEndPoint.dx - toPoint.dx)*state.toAnimationGetPercent(),
+//        state.lineEndPoint.dy
+//    );
 
-    _linePath.lineTo(
-        state.toAnimationGetPercent() <= 0 ? lineStartPoint.dx : lineStartPoint.dx + (state.lineEndPoint.dx - lineStartPoint.dx)*state.toAnimationGetPercent(),
-        state.lineEndPoint.dy
-    );
+//    _linePath.reset();
+//    _linePath.moveTo(
+//        lineStartPoint.dx,
+//        lineStartPoint.dy
+//    );
+//
+//    _linePath.lineTo(
+//        state.toAnimationGetPercent() <= 0 ? lineStartPoint.dx : lineStartPoint.dx + (state.lineEndPoint.dx - lineStartPoint.dx)*state.toAnimationGetPercent(),
+//        state.lineEndPoint.dy
+//    );
 
     canvas.drawPath(_circlePath, _paint);
 //    canvas.drawPath(_linePath, _paint);

@@ -15,6 +15,7 @@ class CYLProgress extends StatefulWidget {
   final int progressCount;
   final double cornerRadius;
   final Color borderColor;
+  final bool animate;
 
   CYLProgress(
       {@required this.type,
@@ -22,9 +23,10 @@ class CYLProgress extends StatefulWidget {
       @required this.colorBuilder,
       @required this.progressCount,
       this.cornerRadius = 10,
-      this.borderColor});
+      this.borderColor,
+      this.animate = false});
 
-  factory CYLProgress.singleCircle(double percent, Color color,{double width = 10, Color borderColor}) {
+  factory CYLProgress.singleCircle(double percent, Color color,{double width = 10, Color borderColor, bool animate}) {
     return CYLProgress(
         type: CYLProgressType.circle,
         progressBuilder: (index) {
@@ -35,10 +37,11 @@ class CYLProgress extends StatefulWidget {
         },
         progressCount: 1,
       cornerRadius: width,
+      animate: animate,
     );
   }
 
-  factory CYLProgress.singleLine(double percent, Color color,{double width = 10, Color borderColor}){
+  factory CYLProgress.singleLine(double percent, Color color,{double width = 10, Color borderColor, bool animate}){
     return CYLProgress(
       type: CYLProgressType.line,
       progressBuilder: (index) {
@@ -49,6 +52,7 @@ class CYLProgress extends StatefulWidget {
       },
       progressCount: 1,
       cornerRadius: width,
+      animate: animate,
     );
   }
 
@@ -57,6 +61,7 @@ class CYLProgress extends StatefulWidget {
 }
 
 class _CYLProgressState extends State<CYLProgress> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
