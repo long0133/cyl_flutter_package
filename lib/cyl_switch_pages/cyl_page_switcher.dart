@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+typedef ClickCallBack = void Function(int);
+
 class CYLPageSwitcher extends StatefulWidget {
 
   final List<String> titles;
@@ -13,8 +15,9 @@ class CYLPageSwitcher extends StatefulWidget {
   final double verticalSpacing;
   final Color selectColor;
   final double cornerRadius;
-  final int initSelectIndex;
+  final int currentIndex;
   final Color color;
+  final ClickCallBack clickCallBack;
 
   CYLPageSwitcher({
     @required this.titles,
@@ -28,7 +31,8 @@ class CYLPageSwitcher extends StatefulWidget {
     this.verticalSpacing = 0,
     this.selectColor = Colors.purpleAccent,
     this.cornerRadius = 5,
-    this.initSelectIndex = 0,
+    this.currentIndex = 0,
+    this.clickCallBack
   });
 
   @override
@@ -42,10 +46,11 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
   double width = 0;
   double height = 0;
   int selectIndex = 0;
+  bool hit = false;
 
   @override
   void initState() {
-    selectIndex = widget.initSelectIndex;
+    selectIndex = widget.currentIndex % widget.titles.length;
     super.initState();
   }
 
@@ -60,10 +65,16 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: (DragUpdateDetails details){
 
-      },
+    if(!hit){
+      selectIndex = widget.currentIndex % widget.titles.length;
+    }else{
+      hit = false;
+    }
+
+    return GestureDetector(
+      onPanUpdate: onPanUpdate,
+      onPanStart: onPanStart,
       child: Container(
         decoration: BoxDecoration(
           color: widget.color,
@@ -76,7 +87,8 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
             this,widget,
             clickCallBack: (int index){
               setState(() {
-
+                selectIndex = index;
+                if(widget.clickCallBack != null) widget.clickCallBack(index);
               });
             }
           ),
@@ -133,9 +145,21 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
       hitTestRectList.add(rect);
     }
   }
+
+
+  void onPanUpdate(DragUpdateDetails details){
+    setState(() {
+
+    });
+  }
+
+  void onPanStart(DragStartDetails details){
+
+  }
+
 }
 
-typedef ClickCallBack = void Function(int);
+
 class CYLPageSwitcherPainter extends CustomPainter{
 
   _CYLPageSwitcherState _state;
@@ -172,6 +196,7 @@ class CYLPageSwitcherPainter extends CustomPainter{
   @override
   bool hitTest(Offset position) {
     int count = 0;
+    _state.hit = true;
     _state.hitTestRectList.forEach((Rect rect){
       if(rect.contains(position)){
         _state.selectIndex = count;

@@ -1,7 +1,7 @@
 import 'package:cyl_flutter_package/check_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:cyl_flutter_package/cyl_progress.dart';
-import 'package:cyl_flutter_package/cyl_page_switcher.dart';
+import 'package:cyl_flutter_package/cyl_switch_pages/cyl_switch_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,7 +35,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-
       _counter++;
     });
   }
@@ -48,14 +47,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
         title: Text(widget.title),
       ),
-      body: Center(
-        child: CYLPageSwitcher(
+      body: Container(
+        child: CYLSwitchPage(
           titles: ['aaaa','bbbb','cccc'],
-          fontSize: 20,
-          horizontalSpacing: 20,
-          verticalSpacing: 10,
-          titleColor: Colors.white,
-          color: Colors.grey[500],
+          children: <Widget>[
+            Container(
+              color: Colors.purpleAccent,
+              width: MediaQuery.of(context).size.width,
+            ),
+            Container(
+              color: Colors.purple,
+              width: MediaQuery.of(context).size.width,
+            ),
+            Container(
+              color: Colors.green,
+              width: MediaQuery.of(context).size.width,
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
