@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         child: CYLSwitchPage(
-          titles: ['aaaa','bbbb','cccc'],
+          titles: ['aaaa','bbbb','cc'],
           children: <Widget>[
             Container(
               color: Colors.purpleAccent,

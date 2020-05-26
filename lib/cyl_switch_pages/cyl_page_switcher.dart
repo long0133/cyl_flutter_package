@@ -39,28 +39,35 @@ class CYLPageSwitcher extends StatefulWidget {
   _CYLPageSwitcherState createState() => _CYLPageSwitcherState();
 }
 
-class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
+typedef StateClickCallBack = void Function(int,Rect);
+class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderStateMixin{
 
   List<TextPainter> textPainters = [];
   List<Rect> hitTestRectList = [];
   double width = 0;
   double height = 0;
   int selectIndex = 0;
+  int lastSelect = 0;
   bool hit = false;
+  Animation leftAnim;
+  AnimationController leftAnimController;
+  Animation rightAnim;
+  AnimationController rightAnimController;
+  Duration animDuration = Duration(milliseconds: 400);
 
   @override
   void initState() {
     selectIndex = widget.currentIndex % widget.titles.length;
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
     width += ((widget.titles.length - 1) + 1) * widget.horizontalSpacing * 2;
     height += widget.verticalSpacing * 2;
     calculateTextWidth();
     calculateHitTestRect();
-    super.didChangeDependencies();
+    //初始动画值
+    leftAnimController = AnimationController(duration: animDuration, vsync: this);
+    rightAnimController = AnimationController(duration:  animDuration, vsync: this);
+    leftAnim = Tween(begin: hitTestRectList.first.left, end: hitTestRectList.last.left).animate(leftAnimController);
+    rightAnim = Tween(begin: hitTestRectList.first.right, end: hitTestRectList.last.right).animate(rightAnimController);
+    super.initState();
   }
 
   @override
@@ -85,16 +92,33 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> {
         child: CustomPaint(
           painter: CYLPageSwitcherPainter(
             this,widget,
-            clickCallBack: (int index){
-              setState(() {
-                selectIndex = index;
-                if(widget.clickCallBack != null) widget.clickCallBack(index);
-              });
-            }
+            clickCallBack: clickCallBack
           ),
         ),
       ),
     );
+  }
+
+  void clickCallBack(int index, Rect rect){
+    setState(() {
+      selectIndex = index;
+      doAnimation();
+      if(widget.clickCallBack != null) widget.clickCallBack(index);
+    });
+  }
+
+  void doAnimation(){
+    print('${widget.currentIndex}---$selectIndex');
+    Rect toRect = hitTestRectList[selectIndex];
+    Rect fromRect = hitTestRectList[widget.currentIndex];
+
+    leftAnimController = AnimationController(duration: animDuration, vsync: this);
+    rightAnimController = AnimationController(duration:  animDuration, vsync: this);
+    leftAnim = Tween(begin: fromRect.left, end: toRect.left).animate(leftAnimController);
+    rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(rightAnimController);
+    leftAnimController.forward();
+    rightAnimController.forward();
+    print('${fromRect.toString()}, ${toRect.toString()}');
   }
 
   void calculateTextWidth(){
@@ -166,7 +190,7 @@ class CYLPageSwitcherPainter extends CustomPainter{
   CYLPageSwitcher _widget;
   Path bgPath;
   Paint bgPaint;
-  ClickCallBack clickCallBack;
+  StateClickCallBack clickCallBack;
 
   CYLPageSwitcherPainter(this._state, this._widget, {this.clickCallBack}) {
     bgPaint = new Paint()
@@ -179,13 +203,15 @@ class CYLPageSwitcherPainter extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
-    
+
     bgPath = Path();
     int selectIndex = _state.selectIndex;
     bgPath.addRRect(RRect.fromLTRBR(
-        _state.hitTestRectList[selectIndex].left,
+//        _state.hitTestRectList[selectIndex].left,
+        _state.leftAnim.value,
         _state.hitTestRectList[selectIndex].top,
-        _state.hitTestRectList[selectIndex].right,
+//        _state.hitTestRectList[selectIndex].right,
+        _state.rightAnim.value,
         _state.hitTestRectList[selectIndex].height,
         Radius.circular(_widget.cornerRadius
         )));
@@ -197,14 +223,16 @@ class CYLPageSwitcherPainter extends CustomPainter{
   bool hitTest(Offset position) {
     int count = 0;
     _state.hit = true;
+    Rect theRect = Rect.zero;
     _state.hitTestRectList.forEach((Rect rect){
       if(rect.contains(position)){
+        theRect = rect;
         _state.selectIndex = count;
       }
       count += 1;
     });
 
-    if(clickCallBack != null) clickCallBack(_state.selectIndex);
+    if(clickCallBack != null) clickCallBack(_state.selectIndex,theRect);
     return super.hitTest(position);
   }
 

@@ -228,7 +228,6 @@ class CYLCheckPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-
     //text paint
     _drawText(canvas, size);
 

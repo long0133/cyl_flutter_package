@@ -1,7 +1,6 @@
 import 'package:cyl_flutter_package/cyl_switch_pages/cyl_page_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CYLSwitchPage extends StatefulWidget {
 
