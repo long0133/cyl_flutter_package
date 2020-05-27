@@ -5,17 +5,19 @@ author:
 homepage:
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
 
   flutter:
     sdk: flutter
   #屏幕自适应
-  flutter_screenutil: 1.0.2
+  flutter_screenutil:
   #状态管理
-  provider: 4.0.4
+  provider:
 
+  #xml
+  xml:
 
 dev_dependencies:
   flutter_test:

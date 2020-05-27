@@ -1,7 +1,10 @@
 import 'package:cyl_flutter_package/check_widget.dart';
+import 'package:cyl_flutter_package/xml_widgets/xml_test.dart';
 import 'package:flutter/material.dart';
-import 'package:cyl_flutter_package/cyl_progress.dart';
+import 'package:cyl_flutter_package/xml_widgets/cyl_xml_table_parse.dart';
+import 'package:cyl_flutter_package/xml_widgets/xml_table_widget.dart';
 import 'package:cyl_flutter_package/cyl_switch_pages/cyl_switch_page.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -40,6 +43,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
@@ -48,29 +56,35 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-        child: CYLSwitchPage(
-          titles: ['aaaa','bbbb','cc'],
-          children: <Widget>[
-            Container(
-              color: Colors.purpleAccent,
-              width: MediaQuery.of(context).size.width,
-            ),
-            Container(
-              color: Colors.purple,
-              width: MediaQuery.of(context).size.width,
-            ),
-            Container(
-              color: Colors.green,
-              width: MediaQuery.of(context).size.width,
-            ),
-          ],
-        ),
+        width: MediaQuery.of(context).size.width - 100,
+        height: MediaQuery.of(context).size.height,
+        child: XMLTableWidget(XMLTest.xmlStr)
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget switchPage(){
+    return CYLSwitchPage(
+      titles: ['aaaa','bbbb','cc'],
+      children: <Widget>[
+        Container(
+          color: Colors.purpleAccent,
+          width: MediaQuery.of(context).size.width,
+        ),
+        Container(
+          color: Colors.purple,
+          width: MediaQuery.of(context).size.width,
+        ),
+        Container(
+          color: Colors.green,
+          width: MediaQuery.of(context).size.width,
+        ),
+      ],
     );
   }
 }
