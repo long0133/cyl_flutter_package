@@ -51,9 +51,47 @@ class XmlTableParse extends Object{
     //计算总行列数
     result.totalRow = result.trs.length;
     result.trs.first.tds.forEach((CYLTableDataCell td){
-      result.totalCol += int.parse(td.colSpan);
+      result.totalCol += td.colSpan;
     });
+
+    //调整数据为标准数据,因跨行跨列空出的列表用空对象占位
+    normalizedTableData();
   }
+
+  void normalizedTableData() {
+    for (int row = 0; row < result.totalRow; row ++) {
+      CYLTableRow tr = result.trs[row];
+      for (int col = 0; col < tr.tds.length; col++) {
+        CYLTableDataCell td = tr.tds[col];
+        //根据上一行本列的rowspan,调整本行行数
+        int lastRow = row - 1;
+        if(lastRow >= 0){
+          CYLTableRow lastTr = result.trs[lastRow];
+          CYLTableDataCell lastTdByCol = lastTr.tds[realIndexByTotalCol(lastTr, col)];
+          if(lastTdByCol.rowSpan > 1){
+            insertZeroTdToCol(tr, col, 1,rowSpan: lastTdByCol.rowSpan-1,colSpan: 1);
+          }
+        }
+      }
+    }
+  }
+
+  int realIndexByTotalCol(CYLTableRow tr, int totalColSpan){
+
+    for(int col = 0; col < tr.tds.length; col++){
+      totalColSpan -= tr.tds[col].colSpan;
+      if(totalColSpan < 0) return col;
+    }
+    return -1;
+  }
+
+  //遍历行时,遇到 colspan>1 的向其前面插入(colspan-1)个空对象 空对象的 colspan,rowspan 可设置
+  void insertZeroTdToCol(CYLTableRow tr, int insertAt, int insertNum, {int colSpan, int rowSpan}){
+    for(int i = 0; i < insertNum; i++){
+      tr.tds.insert(insertAt, CYLTableDataCell.zero(colSpan: colSpan,rowSpan: rowSpan));
+    }
+  }
+
 
   void _parseTableRow(XmlElement elem){
     CYLTableRow tableRow = CYLTableRow();
@@ -63,7 +101,8 @@ class XmlTableParse extends Object{
         //处理 td 标签
         if(subElem.name.toString() == tD){
           XmlElement td = subElem;
-          CYLTableDataCell tdCell = CYLTableDataCell(colSpan: '1', rowSpan: '1', valign: '1', text: '');
+          CYLTableDataCell tdCell = CYLTableDataCell(colSpan: 1, rowSpan: 1, valign: '1', text: '');
+          tableRow.totalCol += 1;
           tableRow.tds.add(tdCell);
           //获取 td 内容
           if(td.text != null && td.text.length != 0){
@@ -72,9 +111,11 @@ class XmlTableParse extends Object{
           //分配 td 属性
           td.attributes.forEach((XmlAttribute attr){
             if(attr.name.toString() == colSpan){
-              tdCell.colSpan = attr.value;
+              tdCell.colSpan = int.parse(attr.value);
+              tableRow.totalCol -= 1;
+              tableRow.totalCol += tdCell.colSpan;
             }else if(attr.name.toString() == rowSpan){
-              tdCell.rowSpan = attr.value;
+              tdCell.rowSpan = int.parse(attr.value);
             }else if(attr.name.toString() == vAlign){
               tdCell.valign = attr.value;
             }
@@ -87,6 +128,7 @@ class XmlTableParse extends Object{
 
 class CYLTableRow extends Object{
   List<CYLTableDataCell> tds = [];
+  int totalCol = 0;
 
   @override
   String toString() {
@@ -99,20 +141,26 @@ class CYLTableRow extends Object{
 }
 
 class CYLTableDataCell extends Object{
-  String colSpan;
-  String rowSpan;
+  int colSpan;
+  int rowSpan;
   String valign;
   String text;
+  bool isPlaceHolder;
 
   CYLTableDataCell({
     this.colSpan,
     this.rowSpan,
     this.text,
-    this.valign
+    this.valign,
+    this.isPlaceHolder = false
 });
+
+  factory CYLTableDataCell.zero({int colSpan = 1,int rowSpan = 1}){
+    return CYLTableDataCell(isPlaceHolder: true, colSpan: colSpan,rowSpan: rowSpan,text: '',valign: '1');
+  }
 
   @override
   String toString() {
-    return '<td colspan:$colSpan rowspan:$rowSpan valign:$valign>$text</td>';
+    return '<td colspan:$colSpan rowspan:$rowSpan valign:$valign>$text</td> -- ${this.isPlaceHolder}';
   }
 }

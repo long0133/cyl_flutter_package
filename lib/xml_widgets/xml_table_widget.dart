@@ -26,12 +26,13 @@ class _XMLTableWidgetState extends State<XMLTableWidget> {
       //计算每列最大字符长度
       maxStringLengthPerCol = List(result.totalCol).map((i)=>0).toList();
       for(int row = 0; row < result.totalRow; row ++){
-        CYLTableRow tableRow = result.trs[row];
-        for(int col = 0; col < tableRow.tds.length; col++){
+        CYLTableRow tr = result.trs[row];
+        for(int col = 0; col < tr.tds.length; col++){
           int lastCol = col == 0 ? col : col - 1;
-          CYLTableDataCell td = tableRow.tds[col];
-          CYLTableDataCell lastTd = tableRow.tds[lastCol];
-          if(maxStringLengthPerCol[col == 0 ? col : (int.parse(lastTd.colSpan) + lastCol)] < td.text.length){
+          CYLTableDataCell td = tr.tds[col];
+          CYLTableDataCell lastTd = tr.tds[lastCol];
+//          print('${tr.toString()}');
+          if(maxStringLengthPerCol[col == 0 ? col : (lastTd.colSpan + lastCol)] < td.text.length){
             maxStringLengthPerCol[col] = td.text.length;
           }
         }
@@ -75,24 +76,32 @@ class CYLTablePainter extends CustomPainter {
       return unitsNum;
     }).toList();
 
+    print('maxStringLengthPerCol: ${_state.maxStringLengthPerCol}');
+    print('vLineOffsetXUnit: ${_state.vLineOffsetXUnit}');
     double tableHeight = 30;
-    double unitWidth = size.width / unitsNum.toDouble();
+    double totoalWidthUnit = size.width / unitsNum.toDouble();
     double initHeight = 0;//横线距离顶部的距离
 
     //绘制横线
     Path hLinePath = Path()..moveTo(0, 0);
     Path vLinePath = Path()..moveTo(0, 0);
 
+    //上一层的 rowsapn 会成为下一层的 col
     for(int row = 0; row < _state.result.totalRow; row ++){
       CYLTableRow tr = _state.result.trs[row];
       int totalColSpan = 0;
       double offsetX = 0;
+      double unitWidth =  unitWidthSum(0, 1) * totoalWidthUnit;
       for(int col = 0; col < tr.tds.length; col++){
-//        int realIndex = min
         CYLTableDataCell td = tr.tds[col];
         if(col != 0){
-          offsetX = _state.vLineOffsetXUnit[totalColSpan].toDouble() * unitWidth;
+          offsetX = _state.vLineOffsetXUnit[totalColSpan-1].toDouble() * totoalWidthUnit;
         }
+
+        totalColSpan += td.colSpan;
+        unitWidth = unitWidthSum(col, td.colSpan) * totoalWidthUnit;
+
+
         //垂直线
         vLinePath.reset();
         vLinePath.moveTo(offsetX, initHeight);
@@ -100,25 +109,37 @@ class CYLTablePainter extends CustomPainter {
 
         //水平线
         //当前
+//        print('${tr.totalCol}');
         hLinePath.reset();
+        if(!td.isPlaceHolder){
+          hLinePath.moveTo(offsetX, initHeight);
+          hLinePath.lineTo(offsetX + unitWidth, initHeight);
+        }
+
 
         canvas.drawPath(vLinePath, tablePaint);
         canvas.drawPath(hLinePath, tablePaint);
-
-        totalColSpan += int.parse(td.colSpan);
       }
 
       initHeight += tableHeight;
     }
 
-//    vLinePath.reset();
-//    vLinePath.moveTo(size.width, 0);
-//    vLinePath.lineTo(size.width, size.height);
-//    canvas.drawPath(vLinePath, tablePaint);
+    vLinePath.reset();
+    vLinePath.moveTo(size.width, 0);
+    vLinePath.lineTo(size.width, size.height);
+    canvas.drawPath(vLinePath, tablePaint);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
+  }
+  
+  double unitWidthSum(int col ,int colspan){
+    double sum = 0;
+    _state.maxStringLengthPerCol.sublist(col,col + colspan).forEach((int len){
+      sum += len.toDouble();
+    });
+    return sum;
   }
 }

@@ -56,8 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-        width: MediaQuery.of(context).size.width - 100,
+        color: Colors.grey[300],
+        width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
+        margin: EdgeInsets.all(30),
         child: XMLTableWidget(XMLTest.xmlStr)
       ),
       floatingActionButton: FloatingActionButton(
