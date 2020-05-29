@@ -18,6 +18,7 @@ class CYLPageSwitcher extends StatefulWidget {
   final int currentIndex;
   final Color color;
   final ClickCallBack clickCallBack;
+  final double switchPercent;
 
   CYLPageSwitcher({
     @required this.titles,
@@ -32,7 +33,8 @@ class CYLPageSwitcher extends StatefulWidget {
     this.selectColor = Colors.purpleAccent,
     this.cornerRadius = 5,
     this.currentIndex = 0,
-    this.clickCallBack
+    this.clickCallBack,
+    this.switchPercent
   });
 
   @override
@@ -108,17 +110,16 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
   }
 
   void doAnimation(){
-    print('${widget.currentIndex}---$selectIndex');
+//    print('${widget.currentIndex}---$selectIndex');
     Rect toRect = hitTestRectList[selectIndex];
     Rect fromRect = hitTestRectList[widget.currentIndex];
-
-    leftAnimController = AnimationController(duration: animDuration, vsync: this);
-    rightAnimController = AnimationController(duration:  animDuration, vsync: this);
+    leftAnimController.reset();
+    rightAnimController.reset();
     leftAnim = Tween(begin: fromRect.left, end: toRect.left).animate(leftAnimController);
     rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(rightAnimController);
     leftAnimController.forward();
     rightAnimController.forward();
-    print('${fromRect.toString()}, ${toRect.toString()}');
+//    print('${fromRect.toString()}, ${toRect.toString()}');
   }
 
   void calculateTextWidth(){
@@ -204,13 +205,12 @@ class CYLPageSwitcherPainter extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
 
+    print('${_state.leftAnim.value} -- ${_state.rightAnim.value}');
     bgPath = Path();
     int selectIndex = _state.selectIndex;
     bgPath.addRRect(RRect.fromLTRBR(
-//        _state.hitTestRectList[selectIndex].left,
-        _state.leftAnim.value,
+        _state.leftAnim.value ,
         _state.hitTestRectList[selectIndex].top,
-//        _state.hitTestRectList[selectIndex].right,
         _state.rightAnim.value,
         _state.hitTestRectList[selectIndex].height,
         Radius.circular(_widget.cornerRadius
@@ -221,6 +221,7 @@ class CYLPageSwitcherPainter extends CustomPainter{
 
   @override
   bool hitTest(Offset position) {
+    if(_widget.switchPercent != 0) return false;
     int count = 0;
     _state.hit = true;
     Rect theRect = Rect.zero;

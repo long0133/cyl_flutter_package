@@ -20,6 +20,7 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
 
   PageController _pageController;
   int currentIndex;
+  double scrollPercent = 0;
 
   @override
   void initState() {
@@ -35,12 +36,11 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
   }
 
   void pageListener(){
-
     double screenW = MediaQuery.of(context).size.width;
-    double percent = _pageController.offset % screenW / screenW;
+    scrollPercent = _pageController.offset % screenW / screenW;
 
     setState(() {
-      if(percent == 0) currentIndex = _pageController.page.toInt();
+      if(scrollPercent == 0) currentIndex = _pageController.page.toInt();
     });
   }
 
@@ -65,6 +65,7 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
                 clickCallBack: (int index){
                   _pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
                 },
+                switchPercent: scrollPercent,
               ),
             ),
           ),
