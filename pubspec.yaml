@@ -15,7 +15,7 @@ dependencies:
   flutter_screenutil:
   #状态管理
   provider:
-
+  scrollable_positioned_list:
   #xml
   xml:
 

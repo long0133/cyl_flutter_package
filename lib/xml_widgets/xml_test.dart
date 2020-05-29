@@ -5,7 +5,7 @@ class XMLTest{
         <tr>
             <td border="0" width="5%">
                 <para>
-                    <text>ON</text>
+                    <text>OFF</text>
                 </para>
             </td>
             <td width="5%">
@@ -15,14 +15,8 @@ class XMLTest{
             </td>
             <td>
                 <para>
-                    <text>白色 ON 灯亮。</text>
+                    <text>冲压空气进气口关闭。</text>
                 </para>
-                <para>
-                    <text>若 CABIN PRESS 面板上的 DITCHING 按钮在正常位：</text>
-                </para>
-                <unlitem linestartsign="#D800" linestartserialid="c3ce6192742f4f64af3b06c37c89026a">冲压空气进气口打开。</unlitem>
-                <unlitem linestartsign="#D800" linestartserialid="c3ce6192742f4f64af3b06c37c89026a">如果 Δp ≥ 1PSI:外流活门控制保持正常。无紧急冲压空气流入。</unlitem>
-                <unlitem linestartsign="#D800" linestartserialid="c3ce6192742f4f64af3b06c37c89026a">如果 Δp &lt; 1PSI:当自动控制下, 外流活门打开大约 50%。人工控制情况下外流活门不会自动打开。紧急冲压空气直接供向混合装置。</unlitem>
             </td>
         </tr>
     </table>

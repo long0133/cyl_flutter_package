@@ -62,7 +62,7 @@ class XmlTableParse extends Object{
     for (int row = 0; row < result.totalRow; row ++) {
       CYLTableRow tr = result.trs[row];
       for (int col = 0; col < tr.tds.length; col++) {
-        CYLTableDataCell td = tr.tds[col];
+//        CYLTableDataCell td = tr.tds[col];
         //根据上一行本列的rowspan,调整本行行数
         int lastRow = row - 1;
         if(lastRow >= 0){
@@ -76,6 +76,7 @@ class XmlTableParse extends Object{
     }
   }
 
+  //结合当前行的 col 计算本 td 对应上一行哪个 td
   int realIndexByTotalCol(CYLTableRow tr, int totalColSpan){
 
     for(int col = 0; col < tr.tds.length; col++){
@@ -85,7 +86,7 @@ class XmlTableParse extends Object{
     return -1;
   }
 
-  //遍历行时,遇到 colspan>1 的向其前面插入(colspan-1)个空对象 空对象的 colspan,rowspan 可设置
+  //插入空对象 空对象的 colspan,rowspan 可设置
   void insertZeroTdToCol(CYLTableRow tr, int insertAt, int insertNum, {int colSpan, int rowSpan}){
     for(int i = 0; i < insertNum; i++){
       tr.tds.insert(insertAt, CYLTableDataCell.zero(colSpan: colSpan,rowSpan: rowSpan));

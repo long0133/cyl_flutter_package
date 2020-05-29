@@ -31,7 +31,6 @@ class _XMLTableWidgetState extends State<XMLTableWidget> {
           int lastCol = col == 0 ? col : col - 1;
           CYLTableDataCell td = tr.tds[col];
           CYLTableDataCell lastTd = tr.tds[lastCol];
-//          print('${tr.toString()}');
           if(maxStringLengthPerCol[col == 0 ? col : (lastTd.colSpan + lastCol)] < td.text.length){
             maxStringLengthPerCol[col] = td.text.length;
           }
@@ -86,7 +85,6 @@ class CYLTablePainter extends CustomPainter {
     Path hLinePath = Path()..moveTo(0, 0);
     Path vLinePath = Path()..moveTo(0, 0);
 
-    //上一层的 rowsapn 会成为下一层的 col
     for(int row = 0; row < _state.result.totalRow; row ++){
       CYLTableRow tr = _state.result.trs[row];
       int totalColSpan = 0;
@@ -109,7 +107,6 @@ class CYLTablePainter extends CustomPainter {
 
         //水平线
         //当前
-//        print('${tr.totalCol}');
         hLinePath.reset();
         if(!td.isPlaceHolder){
           hLinePath.moveTo(offsetX, initHeight);

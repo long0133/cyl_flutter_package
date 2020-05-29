@@ -34,7 +34,7 @@ class CYLPageSwitcher extends StatefulWidget {
     this.cornerRadius = 5,
     this.currentIndex = 0,
     this.clickCallBack,
-    this.switchPercent
+    this.switchPercent,
   });
 
   @override
@@ -48,54 +48,52 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
   List<Rect> hitTestRectList = [];
   double width = 0;
   double height = 0;
-  int selectIndex = 0;
+  //点击选中的 index
+  int hitToSelectIndex = 0;
   int lastSelect = 0;
-  bool hit = false;
+  //点击触发的动画是否开始
+  bool hitAnimTriggered = false;
   Animation leftAnim;
-  AnimationController leftAnimController;
+  AnimationController _leftAnimController;
   Animation rightAnim;
-  AnimationController rightAnimController;
-  Duration animDuration = Duration(milliseconds: 400);
+  AnimationController _rightAnimController;
+  Duration _animDuration = Duration(milliseconds: 400);
+
+  double lastPercent = 0;
+  //页面是前进还是后退
+  bool isForward = true;
 
   @override
   void initState() {
-    selectIndex = widget.currentIndex % widget.titles.length;
+    hitToSelectIndex = widget.currentIndex % widget.titles.length;
     width += ((widget.titles.length - 1) + 1) * widget.horizontalSpacing * 2;
     height += widget.verticalSpacing * 2;
     calculateTextWidth();
     calculateHitTestRect();
     //初始动画值
-    leftAnimController = AnimationController(duration: animDuration, vsync: this);
-    rightAnimController = AnimationController(duration:  animDuration, vsync: this);
-    leftAnim = Tween(begin: hitTestRectList.first.left, end: hitTestRectList.last.left).animate(leftAnimController);
-    rightAnim = Tween(begin: hitTestRectList.first.right, end: hitTestRectList.last.right).animate(rightAnimController);
+    _leftAnimController = AnimationController(duration: _animDuration, vsync: this);
+    _rightAnimController = AnimationController(duration:  _animDuration, vsync: this);
+    leftAnim = Tween(begin: hitTestRectList.first.left, end: hitTestRectList.last.left).animate(_leftAnimController);
+    rightAnim = Tween(begin: hitTestRectList.first.right, end: hitTestRectList.last.right).animate(_rightAnimController);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    isForward = widget.switchPercent - lastPercent > 0;
+    lastPercent = widget.switchPercent;
 
-    if(!hit){
-      selectIndex = widget.currentIndex % widget.titles.length;
-    }else{
-      hit = false;
-    }
-
-    return GestureDetector(
-      onPanUpdate: onPanUpdate,
-      onPanStart: onPanStart,
-      child: Container(
-        decoration: BoxDecoration(
+    return Container(
+      decoration: BoxDecoration(
           color: widget.color,
           borderRadius: BorderRadius.all(Radius.circular(widget.cornerRadius))
-        ),
-        width: width,
-        height: height,
-        child: CustomPaint(
-          painter: CYLPageSwitcherPainter(
+      ),
+      width: width,
+      height: height,
+      child: CustomPaint(
+        painter: CYLPageSwitcherPainter(
             this,widget,
             clickCallBack: clickCallBack
-          ),
         ),
       ),
     );
@@ -103,7 +101,7 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
 
   void clickCallBack(int index, Rect rect){
     setState(() {
-      selectIndex = index;
+      hitToSelectIndex = index;
       doAnimation();
       if(widget.clickCallBack != null) widget.clickCallBack(index);
     });
@@ -111,14 +109,19 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
 
   void doAnimation(){
 //    print('${widget.currentIndex}---$selectIndex');
-    Rect toRect = hitTestRectList[selectIndex];
+    Rect toRect = hitTestRectList[hitToSelectIndex];
     Rect fromRect = hitTestRectList[widget.currentIndex];
-    leftAnimController.reset();
-    rightAnimController.reset();
-    leftAnim = Tween(begin: fromRect.left, end: toRect.left).animate(leftAnimController);
-    rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(rightAnimController);
-    leftAnimController.forward();
-    rightAnimController.forward();
+    _leftAnimController.reset();
+    _rightAnimController.reset();
+    leftAnim = Tween(begin: fromRect.left, end: toRect.left).animate(_leftAnimController);
+    rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(_rightAnimController)..addStatusListener((status){
+      //点击后动画结束时,设置 hit 为 false
+      if(status == AnimationStatus.completed) {
+        hitAnimTriggered = false;
+      }
+    });
+    _leftAnimController.forward();
+    _rightAnimController.forward();
 //    print('${fromRect.toString()}, ${toRect.toString()}');
   }
 
@@ -170,18 +173,6 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
       hitTestRectList.add(rect);
     }
   }
-
-
-  void onPanUpdate(DragUpdateDetails details){
-    setState(() {
-
-    });
-  }
-
-  void onPanStart(DragStartDetails details){
-
-  }
-
 }
 
 
@@ -205,14 +196,37 @@ class CYLPageSwitcherPainter extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
 
-    print('${_state.leftAnim.value} -- ${_state.rightAnim.value}');
+//    print('${_state.leftAnim.value} -- ${_state.rightAnim.value}');
     bgPath = Path();
-    int selectIndex = _state.selectIndex;
+    int selectIndex = _state.hitToSelectIndex;
+    int nextIndex = _widget.currentIndex;
+    if(_state.isForward){
+      nextIndex = nextIndex == _state.hitTestRectList.length - 1 ? nextIndex : nextIndex + 1;
+    }else{
+      nextIndex = nextIndex == 0 ? 0 : nextIndex - 1;
+    }
+//    nextIndex = nextIndex < 0 ? 0 : nextIndex;
+//    print('next:$nextIndex -- ${_widget.switchPercent} -- ${_state.isForward}');
+
+    double left =  _state.hitTestRectList[selectIndex].left;
+    double right =  _state.hitTestRectList[selectIndex].right;
+    double top =  _state.hitTestRectList[selectIndex].top;
+    double bottom =  _state.hitTestRectList[selectIndex].bottom;
+
+    if(_state.hitAnimTriggered){
+      left = _state.leftAnim.value;
+      right = _state.rightAnim.value;
+    }else{
+
+    }
+
+    print('sel: $selectIndex, next:$nextIndex, percent:${_widget.switchPercent}');
+
     bgPath.addRRect(RRect.fromLTRBR(
-        _state.leftAnim.value ,
-        _state.hitTestRectList[selectIndex].top,
-        _state.rightAnim.value,
-        _state.hitTestRectList[selectIndex].height,
+        left,
+        top,
+        right,
+        bottom,
         Radius.circular(_widget.cornerRadius
         )));
     canvas.drawPath(bgPath, bgPaint);
@@ -223,17 +237,17 @@ class CYLPageSwitcherPainter extends CustomPainter{
   bool hitTest(Offset position) {
     if(_widget.switchPercent != 0) return false;
     int count = 0;
-    _state.hit = true;
+    _state.hitAnimTriggered = true;
     Rect theRect = Rect.zero;
     _state.hitTestRectList.forEach((Rect rect){
       if(rect.contains(position)){
         theRect = rect;
-        _state.selectIndex = count;
+        _state.hitToSelectIndex = count;
       }
       count += 1;
     });
-
-    if(clickCallBack != null) clickCallBack(_state.selectIndex,theRect);
+    print('${_state.hitToSelectIndex}');
+    if(clickCallBack != null) clickCallBack(_state.hitToSelectIndex,theRect);
     return super.hitTest(position);
   }
 

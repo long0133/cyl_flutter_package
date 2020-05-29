@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:cyl_flutter_package/xml_widgets/cyl_xml_table_parse.dart';
 import 'package:cyl_flutter_package/xml_widgets/xml_table_widget.dart';
 import 'package:cyl_flutter_package/cyl_switch_pages/cyl_switch_page.dart';
+import 'package:cyl_flutter_package/test/cyl_table.dart';
+import 'package:cyl_flutter_package/test/cyl_scroll_view.dart';
 
 
 void main() => runApp(MyApp());
@@ -57,15 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         color: Colors.grey[300],
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        margin: EdgeInsets.all(30),
-        child: XMLTableWidget(XMLTest.xmlStr)
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: switchPage(),
+//        margin: EdgeInsets.all(30),
+//        width: MediaQuery.of(context).size.width,
+//        height: MediaQuery.of(context).size.height,
+//        child: CYLScrollView(),
+//        child: XMLTableWidget(XMLTest.xmlStr2)
+//        child: CYLTable(XMLTest.xmlStr),
       ),
     );
   }
