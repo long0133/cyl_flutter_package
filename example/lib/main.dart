@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cyl_flutter_package/xml_widgets/cyl_xml_table_parse.dart';
 import 'package:cyl_flutter_package/xml_widgets/xml_table_widget.dart';
 import 'package:cyl_flutter_package/cyl_switch_pages/cyl_switch_page.dart';
-import 'package:cyl_flutter_package/test/cyl_table.dart';
-import 'package:cyl_flutter_package/test/cyl_scroll_view.dart';
-
 
 void main() => runApp(MyApp());
 
@@ -61,11 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.grey[300],
         child: switchPage(),
 //        margin: EdgeInsets.all(30),
-//        width: MediaQuery.of(context).size.width,
-//        height: MediaQuery.of(context).size.height,
-//        child: CYLScrollView(),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
 //        child: XMLTableWidget(XMLTest.xmlStr2)
-//        child: CYLTable(XMLTest.xmlStr),
       ),
     );
   }
@@ -75,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
       titles: ['aaaa','bbbb','cc'],
       children: <Widget>[
         Container(
-          color: Colors.purpleAccent,
+          color: Colors.grey,
           width: MediaQuery.of(context).size.width,
         ),
         Container(
@@ -83,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
           width: MediaQuery.of(context).size.width,
         ),
         Container(
-          color: Colors.green,
+          color: Colors.indigo,
           width: MediaQuery.of(context).size.width,
         ),
       ],

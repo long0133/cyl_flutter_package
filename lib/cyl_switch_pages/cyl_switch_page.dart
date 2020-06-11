@@ -38,9 +38,8 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
   void pageListener(){
     double screenW = MediaQuery.of(context).size.width;
     scrollPercent = _pageController.offset % screenW / screenW;
-
     setState(() {
-      if(scrollPercent == 0) currentIndex = _pageController.page.toInt();
+      currentIndex = _pageController.page.toInt();
     });
   }
 
@@ -78,6 +77,7 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
                 scrollDirection: Axis.horizontal,
                 controller: _pageController,
                 children: widget.children,
+                physics: ScrollPhysics(parent: ClampingScrollPhysics()),
               ),
             ),
           )

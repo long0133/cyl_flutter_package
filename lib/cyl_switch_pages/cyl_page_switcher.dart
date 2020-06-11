@@ -60,8 +60,9 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
   Duration _animDuration = Duration(milliseconds: 400);
 
   double lastPercent = 0;
+  int doneDragSelect = 0;
   //页面是前进还是后退
-  bool isForward = true;
+//  bool isForward = true;
 
   @override
   void initState() {
@@ -80,8 +81,6 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    isForward = widget.switchPercent - lastPercent > 0;
-    lastPercent = widget.switchPercent;
 
     return Container(
       decoration: BoxDecoration(
@@ -108,21 +107,22 @@ class _CYLPageSwitcherState extends State<CYLPageSwitcher> with TickerProviderSt
   }
 
   void doAnimation(){
-//    print('${widget.currentIndex}---$selectIndex');
     Rect toRect = hitTestRectList[hitToSelectIndex];
     Rect fromRect = hitTestRectList[widget.currentIndex];
     _leftAnimController.reset();
     _rightAnimController.reset();
+    rightAnim.removeStatusListener(statusListener);
     leftAnim = Tween(begin: fromRect.left, end: toRect.left).animate(_leftAnimController);
-    rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(_rightAnimController)..addStatusListener((status){
-      //点击后动画结束时,设置 hit 为 false
-      if(status == AnimationStatus.completed) {
-        hitAnimTriggered = false;
-      }
-    });
+    rightAnim = Tween(begin: fromRect.right, end: toRect.right).animate(_rightAnimController)..addStatusListener(statusListener);
     _leftAnimController.forward();
     _rightAnimController.forward();
 //    print('${fromRect.toString()}, ${toRect.toString()}');
+  }
+
+  void statusListener(AnimationStatus status){
+    if(AnimationStatus.completed == status){
+      hitAnimTriggered = false;
+    }
   }
 
   void calculateTextWidth(){
@@ -195,18 +195,10 @@ class CYLPageSwitcherPainter extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
-
-//    print('${_state.leftAnim.value} -- ${_state.rightAnim.value}');
     bgPath = Path();
     int selectIndex = _state.hitToSelectIndex;
-    int nextIndex = _widget.currentIndex;
-    if(_state.isForward){
-      nextIndex = nextIndex == _state.hitTestRectList.length - 1 ? nextIndex : nextIndex + 1;
-    }else{
-      nextIndex = nextIndex == 0 ? 0 : nextIndex - 1;
-    }
-//    nextIndex = nextIndex < 0 ? 0 : nextIndex;
-//    print('next:$nextIndex -- ${_widget.switchPercent} -- ${_state.isForward}');
+    int curIndex = _widget.currentIndex;
+    double percent = _widget.switchPercent;
 
     double left =  _state.hitTestRectList[selectIndex].left;
     double right =  _state.hitTestRectList[selectIndex].right;
@@ -218,9 +210,45 @@ class CYLPageSwitcherPainter extends CustomPainter{
       right = _state.rightAnim.value;
     }else{
 
+      if(_widget.switchPercent == 0){
+        _state.hitAnimTriggered = false;
+        _state.hitToSelectIndex = _state.doneDragSelect;
+        left =  _state.hitTestRectList[_state.doneDragSelect].left;
+        right =  _state.hitTestRectList[_state.doneDragSelect].right;
+      }else{
+        if(percent - _state.lastPercent < 0){
+          if(percent < 0.5){
+            print('backward -> forward');
+            left = _state.hitTestRectList[curIndex+1].left - _state.hitTestRectList[curIndex].width * (1-percent);
+            right = _state.hitTestRectList[curIndex+1].right - _state.hitTestRectList[curIndex+1].width *  (1-percent);
+            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
+            _state.doneDragSelect = curIndex;
+          }else{
+            print('backward -> backward');
+            left = _state.hitTestRectList[curIndex+1].left - _state.hitTestRectList[curIndex].width * (1-percent);
+            right = _state.hitTestRectList[curIndex+1].right - _state.hitTestRectList[curIndex+1].width *  (1-percent);
+            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
+            _state.doneDragSelect = curIndex + 1;
+          }
+        }else{
+          if(percent < 0.5){
+            print('forward -> backward');
+            left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
+            right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
+            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
+            _state.doneDragSelect = curIndex;
+          }else{
+            print('forward -> forward');
+            left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
+            right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
+            _state.doneDragSelect = curIndex + 1;
+            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
+          }
+        }
+        _state.lastPercent = _widget.switchPercent;
+      }
     }
-
-    print('sel: $selectIndex, next:$nextIndex, percent:${_widget.switchPercent}');
+    print('left: $left ---- right:$right');
 
     bgPath.addRRect(RRect.fromLTRBR(
         left,
