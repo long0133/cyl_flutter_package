@@ -6,10 +6,12 @@ class CYLSwitchPage extends StatefulWidget {
 
   final List<Widget> children;
   final List<String> titles;
+  final Color indicatorColor;
 
   CYLSwitchPage({
     @required this.children,
-    @required this.titles
+    @required this.titles,
+    @required this.indicatorColor
 });
 
   @override
@@ -51,16 +53,18 @@ class _CYLSwitchPageState extends State<CYLSwitchPage> {
       child: Column(
         children: <Widget>[
           Expanded(
-            flex: 1,
-            child: Center(
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(10),
               child: CYLPageSwitcher(
                 titles: widget.titles,
                 fontSize: 20,
-                horizontalSpacing: 20,
-                verticalSpacing: 10,
+                horizontalSpacing: 30,
+                verticalSpacing: 3,
                 titleColor: Colors.white,
                 color: Colors.grey[500],
                 currentIndex: currentIndex,
+                selectColor: widget.indicatorColor,
                 clickCallBack: (int index){
                   _pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
                 },

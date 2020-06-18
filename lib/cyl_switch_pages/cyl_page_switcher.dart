@@ -26,11 +26,11 @@ class CYLPageSwitcher extends StatefulWidget {
     this.titleColor = Colors.black,
     this.fontStyle = FontStyle.normal,
     this.textAlign = TextAlign.center,
-    this.fontSize = 20,
+    this.fontSize = 15,
     this.fontWeight = FontWeight.normal,
     this.horizontalSpacing = 0,
     this.verticalSpacing = 0,
-    this.selectColor = Colors.purpleAccent,
+    this.selectColor = Colors.lightBlueAccent,
     this.cornerRadius = 5,
     this.currentIndex = 0,
     this.clickCallBack,
@@ -218,37 +218,28 @@ class CYLPageSwitcherPainter extends CustomPainter{
       }else{
         if(percent - _state.lastPercent < 0){
           if(percent < 0.5){
-            print('backward -> forward');
             left = _state.hitTestRectList[curIndex+1].left - _state.hitTestRectList[curIndex].width * (1-percent);
             right = _state.hitTestRectList[curIndex+1].right - _state.hitTestRectList[curIndex+1].width *  (1-percent);
-            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
             _state.doneDragSelect = curIndex;
           }else{
-            print('backward -> backward');
             left = _state.hitTestRectList[curIndex+1].left - _state.hitTestRectList[curIndex].width * (1-percent);
             right = _state.hitTestRectList[curIndex+1].right - _state.hitTestRectList[curIndex+1].width *  (1-percent);
-            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
             _state.doneDragSelect = curIndex + 1;
           }
         }else{
           if(percent < 0.5){
-            print('forward -> backward');
             left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
             right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
-            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
             _state.doneDragSelect = curIndex;
           }else{
-            print('forward -> forward');
             left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
             right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
             _state.doneDragSelect = curIndex + 1;
-            print('sel: $selectIndex, curIndex:$curIndex, percent:$percent ');
           }
         }
         _state.lastPercent = _widget.switchPercent;
       }
     }
-    print('left: $left ---- right:$right');
 
     bgPath.addRRect(RRect.fromLTRBR(
         left,

@@ -56,32 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         color: Colors.grey[300],
-        child: switchPage(),
-//        margin: EdgeInsets.all(30),
+        child: Container(),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-//        child: XMLTableWidget(XMLTest.xmlStr2)
       ),
-    );
-  }
-
-  Widget switchPage(){
-    return CYLSwitchPage(
-      titles: ['aaaa','bbbb','cc'],
-      children: <Widget>[
-        Container(
-          color: Colors.grey,
-          width: MediaQuery.of(context).size.width,
-        ),
-        Container(
-          color: Colors.purple,
-          width: MediaQuery.of(context).size.width,
-        ),
-        Container(
-          color: Colors.indigo,
-          width: MediaQuery.of(context).size.width,
-        ),
-      ],
     );
   }
 }
