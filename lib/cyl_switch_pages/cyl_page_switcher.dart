@@ -199,6 +199,7 @@ class CYLPageSwitcherPainter extends CustomPainter{
     int selectIndex = _state.hitToSelectIndex;
     int curIndex = _widget.currentIndex;
     double percent = _widget.switchPercent;
+    int hitTestLength = _state.hitTestRectList.length;
 
     double left =  _state.hitTestRectList[selectIndex].left;
     double right =  _state.hitTestRectList[selectIndex].right;
@@ -232,9 +233,15 @@ class CYLPageSwitcherPainter extends CustomPainter{
             right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
             _state.doneDragSelect = curIndex;
           }else{
-            left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
-            right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
-            _state.doneDragSelect = curIndex + 1;
+            if(curIndex == hitTestLength - 1){
+              left = _state.hitTestRectList[curIndex-1].left + _state.hitTestRectList[curIndex-1].width * percent;
+              right = left + _state.hitTestRectList[curIndex].width * percent;
+              _state.doneDragSelect = curIndex;
+            }else{
+              left = _state.hitTestRectList[curIndex].left + _state.hitTestRectList[curIndex].width * percent;
+              right = _state.hitTestRectList[curIndex].right + _state.hitTestRectList[curIndex+1].width * percent;
+              _state.doneDragSelect = curIndex + 1;
+            }
           }
         }
         _state.lastPercent = _widget.switchPercent;
@@ -254,7 +261,8 @@ class CYLPageSwitcherPainter extends CustomPainter{
 
   @override
   bool hitTest(Offset position) {
-    if(_widget.switchPercent != 0) return false;
+    print('${_widget.switchPercent}');
+//    if(_widget.switchPercent != 0) return false;
     int count = 0;
     _state.hitAnimTriggered = true;
     Rect theRect = Rect.zero;

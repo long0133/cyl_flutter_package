@@ -56,7 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         color: Colors.grey[300],
-        child: Container(),
+        child: Container(
+          child: CYLSwitchPage(children: [Container(),Container(),Container()], titles: ['aaaaa','bbbb','ccc'], indicatorColor: Colors.orangeAccent),
+        ),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
       ),
